@@ -5,10 +5,14 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 // import * as myExtension from '../../extension';
 
+import SimpleGit from 'simple-git';
+
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
-	test('Sample test', () => {
+	test('simple-git test', async () => {
+		let git = SimpleGit();
+		let resp = (await git.raw(['ls-remote', "https://gitlab.com/nelsonjchen/dev-container-test"]));
 		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
 		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
 	});
