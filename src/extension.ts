@@ -32,7 +32,7 @@ export class NonGitHubRemoteSourceProvider implements RemoteSourceProvider {
 
 		return [
 			{
-				name: "Enter the repository URL above.",
+				name: "Enter the repository clone URL above as a query. This is kind of a hack.",
 				url: ""
 			}
 		];
