@@ -8,8 +8,9 @@ import * as myExtension from '../../extension';
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
-	test('simple-git test', async () => {
+	test('simple provider test', async () => {
 		let provider = new myExtension.NonGitHubRemoteSourceProvider();
+		// Test against a GitLab
 		let branches = await provider.getBranches("https://gitlab.com/nelsonjchen/dev-container-test");
 		assert.ok(branches.length > 2);
 	});

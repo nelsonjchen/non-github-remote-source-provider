@@ -1,5 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import simpleGit from 'simple-git';
 import * as vscode from 'vscode';
 import { RemoteSource, RemoteSourceProvider } from './typings/git';
 
@@ -21,8 +22,28 @@ export class NonGitHubRemoteSourceProvider implements RemoteSourceProvider {
 		return [];
 	}
 	async getBranches(url: string): Promise<string[]> {
-		// Assume HEAD is the default branch
-		return [];
+		let git = simpleGit();
+		let branches: string[];
+		try {
+			let result = await git.raw(['ls-remote', url]);
+			let commitReferences = result
+				.split('\n')
+				.filter(line => line.length !== 0)
+				.map(line => {
+					let [commit, reference] = line.split('\t');
+					return { commit, reference };
+				});
+			let branchCommitReferences = commitReferences.filter(
+				ref => ref.reference.startsWith('refs/heads/')
+			);
+			branches = branchCommitReferences.map(ref => ref.reference.substr(11));
+		} catch (error) {
+			console.info("error on retrieval, returning empty branch array");
+			console.warn(error);
+			return [];
+		}
+
+		return branches;
 	}
 }
 
@@ -47,4 +68,4 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
