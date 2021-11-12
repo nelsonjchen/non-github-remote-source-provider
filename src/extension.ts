@@ -7,13 +7,6 @@ import { GitExtension } from './typings/git';
 import { RemoteSource, RemoteSourceProvider } from './typings/git';
 import { combinedDisposable, dispose } from './util';
 
-interface RemoteRepositoryReference {
-	// We don't care
-	commit: string;
-	// Reference string like "refs/heads/master"
-	reference: string;
-}
-
 export class NonGitHubRemoteSourceProvider implements RemoteSourceProvider {
 	readonly name = "Non GitHub";
 	icon = "repo";
