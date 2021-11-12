@@ -19,10 +19,23 @@ export class NonGitHubRemoteSourceProvider implements RemoteSourceProvider {
 	icon = "repo";
 	supportsQuery = true;
 	async getRemoteSources(query?: string): Promise<RemoteSource[]> {
-		// There is no way to query all non-GitHub providers in the universe.
-		// Well, not in any reasonable way.
-		// Just return an empty array.
-		return [];
+		// Use the query as the
+		if (query) {
+			return [
+				{
+					name: query,
+					description: "",
+					url: query,
+				}
+			];
+		}
+
+		return [
+			{
+				name: "Enter the repository URL above.",
+				url: ""
+			}
+		];
 	}
 	async getBranches(url: string): Promise<string[]> {
 		let git = simpleGit();
