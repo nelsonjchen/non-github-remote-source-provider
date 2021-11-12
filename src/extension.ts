@@ -2,7 +2,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import simpleGit from 'simple-git';
 import * as vscode from 'vscode';
+import { extensions } from 'vscode';
+import { GitExtension } from './typings/git';
 import { RemoteSource, RemoteSourceProvider } from './typings/git';
+import { combinedDisposable, dispose } from './util';
 
 interface RemoteRepositoryReference {
 	// We don't care
@@ -47,24 +50,36 @@ export class NonGitHubRemoteSourceProvider implements RemoteSourceProvider {
 	}
 }
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+// Pretty much borrowed from GitHub's extension.
+// Enablement of GitHub's extension is bound to Git's own enablement.
 export function activate(context: vscode.ExtensionContext) {
+	const disposables = new Set<vscode.Disposable>();
+	context.subscriptions.push(combinedDisposable(disposables));
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "non-github-remote-source-provider" is now active!');
+	const init = () => {
+		try {
+			const gitAPI = gitExtension.getAPI(1);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('non-github-remote-source-provider.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Non-GitHub Remote Source Provider!');
-	});
+			disposables.add(gitAPI.registerRemoteSourceProvider(new NonGitHubRemoteSourceProvider()));
+		} catch (err) {
+			console.error('Could not initialize Non-GitHub Remote Source Provider extension');
+			console.warn(err);
+		}
+	};
 
-	context.subscriptions.push(disposable);
+	const onDidChangeGitExtensionEnablement = (enabled: boolean) => {
+		if (!enabled) {
+			dispose(disposables);
+			disposables.clear();
+		} else {
+			init();
+		}
+	};
+
+
+	const gitExtension = extensions.getExtension<GitExtension>('vscode.git')!.exports;
+	context.subscriptions.push(gitExtension.onDidChangeEnablement(onDidChangeGitExtensionEnablement));
+	onDidChangeGitExtensionEnablement(gitExtension.enabled);
 }
 
 // this method is called when your extension is deactivated

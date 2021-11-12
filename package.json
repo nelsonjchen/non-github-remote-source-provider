@@ -10,7 +10,10 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:non-github-remote-source-provider.helloWorld"
+    "*"
+  ],
+  "extensionDependencies": [
+    "vscode.git"
   ],
   "main": "./out/extension.js",
   "contributes": {
